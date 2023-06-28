@@ -3,17 +3,47 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import SearchInput from './components/SearchInput';
 import getImageForWeather from './utils/getImageForWeather';
-
+import {fetchData} from './utils/api';
 
 const App = () => {
+  const [location, setLocation] = useState('Moscow');
+
+  // update the data received according the location
+  const [data, setData] = useState({});
+
+  const handleLocationChange = location => {
+    // get the location from searchInput
+    setLocation(location);
+  };
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const apiData = await fetchData(location);
+        setData(apiData);
+      } catch (error) {
+        // handle error;
+        console.log(error);
+      }
+    };
+
+    getData();
+  }, [location]);
+
+  console.log(data);
+
+  // coverting the kelvin to celsuis
+  function convertKelvinToCel(n) {
+    return Math.round(n - 273.15);
+  }
+
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <ImageBackground
@@ -21,12 +51,17 @@ const App = () => {
         style={styles.imageContainer}
         imageStyle={styles.image}>
         <View style={styles.detailsContainer}>
-          <Text style={[styles.largeText, styles.textStyle]}>
-            San Francisco
+          <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
+          <Text style={[styles.smallText, styles.textStyle]}>
+            {data.weather[0].description}
           </Text>
-          <Text style={[styles.smallText, styles.textStyle]}>Light Cloud</Text>
-          <Text style={[styles.largeText, styles.textStyle]}>24°</Text>
-          <SearchInput placeHolder="Search any city" />
+          <Text style={[styles.largeText, styles.textStyle]}>
+            {convertKelvinToCel(data.main.temp)}°c
+          </Text>
+          <SearchInput
+            placeHolder="Search any city"
+            handleLocation={handleLocationChange}
+          />
         </View>
       </ImageBackground>
     </KeyboardAvoidingView>

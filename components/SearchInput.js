@@ -1,15 +1,30 @@
 import {StyleSheet, Text, View, TextInput} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 
 const SearchInput = props => {
+  const [searchText, setSearchText] = useState('');
+
+  function handleChangeText(data) {
+    // update the new location
+    setSearchText(data);
+  }
+
+  function handleInputSubmit() {
+    // send the data to the parent component
+    props.handleLocation(searchText);
+  }
+
   return (
     <View style={styles.container}>
       <TextInput
+        // value={searchText}
         autoCorrect={false}
         placeholder={props.placeHolder}
         placeholderTextColor="white"
         style={styles.textInput}
         clearButtonMode="always"
+        onChangeText={handleChangeText}
+        onSubmitEditing={handleInputSubmit}
       />
     </View>
   );
