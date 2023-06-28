@@ -13,7 +13,7 @@ import getImageForWeather from './utils/getImageForWeather';
 import {fetchData} from './utils/api';
 
 const App = () => {
-  const [location, setLocation] = useState('Moscow');
+  const [location, setLocation] = useState('Kolkata');
 
   // update the data received according the location
   const [data, setData] = useState({});
@@ -47,21 +47,31 @@ const App = () => {
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <ImageBackground
-        source={getImageForWeather('Clear')}
+        source={
+          data.weather && data.weather.length > 0
+            ? getImageForWeather(data.weather[0].description)
+            : null
+        }
         style={styles.imageContainer}
         imageStyle={styles.image}>
         <View style={styles.detailsContainer}>
-          <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
-          <Text style={[styles.smallText, styles.textStyle]}>
-            {data.weather[0].description}
-          </Text>
-          <Text style={[styles.largeText, styles.textStyle]}>
-            {convertKelvinToCel(data.main.temp)}°c
-          </Text>
-          <SearchInput
-            placeHolder="Search any city"
-            handleLocation={handleLocationChange}
-          />
+          <View style={styles.detailsContainer}>
+            <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
+            {data.weather && data.weather.length > 0 && (
+              <Text style={[styles.smallText, styles.textStyle]}>
+                {data.weather[0].description}
+              </Text>
+            )}
+            {data.main && (
+              <Text style={[styles.largeText, styles.textStyle]}>
+                {convertKelvinToCel(data.main.temp)}°c
+              </Text>
+            )}
+            <SearchInput
+              placeHolder="Search any city"
+              handleLocation={handleLocationChange}
+            />
+          </View>
         </View>
       </ImageBackground>
     </KeyboardAvoidingView>
@@ -73,7 +83,6 @@ export default App;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#34495E',
   },
   imageContainer: {
     flex: 1,
